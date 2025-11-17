@@ -1,22 +1,22 @@
 const axios = require("axios");
 
-const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN; // Your Cloud API token
-const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID; // Your WhatsApp Cloud Phone Number ID
+const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
+const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
 /**
  * Send WhatsApp message via Cloud API
- * @param {string} phone - Phone number with country code, e.g., 91XXXXXXXXXX
- * @param {string} message - Message to send
+ * @param {string} phone - recipient number (with country code)
+ * @param {string} message - message content
  */
 async function sendWhatsAppMessage(phone, message) {
   if (!WHATSAPP_TOKEN || !PHONE_NUMBER_ID) {
-    throw new Error("WhatsApp Cloud API credentials not set");
+    throw new Error("WhatsApp credentials not set");
   }
 
-  const url = `https://graph.facebook.com/v17.0/${PHONE_NUMBER_ID}/messages`;
+  const url = `https://graph.facebook.com/v22.0/${PHONE_NUMBER_ID}/messages`;
   const payload = {
     messaging_product: "whatsapp",
-    to: phone, // must include country code
+    to: phone,
     type: "text",
     text: { body: message },
   };
@@ -28,7 +28,6 @@ async function sendWhatsAppMessage(phone, message) {
         "Content-Type": "application/json",
       },
     });
-
     return res.data;
   } catch (err) {
     console.error("WhatsApp API error:", err.response?.data || err.message);
