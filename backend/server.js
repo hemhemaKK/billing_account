@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const errorHandler = require('./middlewares/errorHandler');
-const { initWhatsApp } = require('./services/whatsappService');
 
 // routes
 const adminRoutes = require('./routes/adminRoutes');
@@ -13,7 +12,6 @@ const ledgerRoutes = require('./routes/ledgerRoutes');
 const advanceyearRoutes = require('./routes/advanceyearRoutes');
 const cityRoutes = require('./routes/cityRoutes'); // Cities
 const advanceUserRoutes = require('./routes/advanceUserRoutes'); // Users under city
-
 const advanceledgerRoutes = require('./routes/advanceLedgerRoutes');
 
 const app = express();
@@ -25,24 +23,14 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Init WhatsApp on server start
-initWhatsApp().catch(err => console.error("WhatsApp init error:", err));
-
-// Routes
+// ROUTES
 app.use('/api/admin', adminRoutes);
 app.use('/api/years', yearRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/ledger', ledgerRoutes);
-
-// Advance year routes
 app.use('/api/advanceyears', advanceyearRoutes);
-
-// City routes
-app.use('/api/cities', cityRoutes); 
-
-// Advance users (users under a city)
+app.use('/api/cities', cityRoutes);
 app.use('/api/advanceUsers', advanceUserRoutes);
-
 app.use('/api/advanceledger', advanceledgerRoutes);
 
 // Error handler (must be last)
