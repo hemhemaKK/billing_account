@@ -49,7 +49,7 @@ Total: ${ledger.total || '-'}
 Balance: ${ledger.balanceAtThatTime || '-'}
 Date: ${ledger.date.toDateString()}`;
 
-    await sendWhatsAppMessage(userPhone, message);
+    await sendWhatsAppMessage(userPhone, null, 'hello_world');
 
     // Optional: mark the ledger entry as "message sent"
     ledger.sentMessage = { content: message, sentAt: new Date() };
