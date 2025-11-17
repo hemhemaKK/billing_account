@@ -33,15 +33,15 @@ router.get('/summary/:userId', auth, getLedgerSummary);
 // GET single ledger entry
 router.get('/single/:id', auth, getEntry);
 
-// SEND WhatsApp message for a ledger entry
+// SEND WhatsApp message for a ledger entry using Cloud API
 router.post('/send-message/:ledgerId', auth, async (req, res, next) => {
   try {
     const ledger = await Ledger.findById(req.params.ledgerId).populate('userId');
     if (!ledger) return res.status(404).json({ msg: 'Ledger not found' });
 
     const userPhone = ledger.userId.phone;
+    if (!userPhone) return res.status(400).json({ msg: 'User phone number not found' });
 
-    // UPDATED WHATSAPP MESSAGE FORMAT
     const message =
       `Ledger Update:
 Type: ${ledger.type.toUpperCase()}
@@ -52,11 +52,13 @@ Date: ${ledger.date.toDateString()}`;
 
     await sendWhatsAppMessage(userPhone, message);
 
+    // mark as sent
     ledger.sentMessage = { content: message, sentAt: new Date() };
     await ledger.save();
 
-    res.json({ msg: 'Message sent successfully' });
+    res.json({ msg: 'WhatsApp message sent successfully' });
   } catch (err) {
+    console.error("WhatsApp sending error:", err.message);
     next(err);
   }
 });

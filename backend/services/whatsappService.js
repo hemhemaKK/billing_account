@@ -1,43 +1,39 @@
-const wppconnect = require('@wppconnect-team/wppconnect');
-const path = require('path');
+const axios = require("axios");
 
-let client;
+const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN; // Your Cloud API token
+const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID; // Your WhatsApp Cloud Phone Number ID
 
-// Folder to store WhatsApp session
-const SESSION_DIR = path.join(__dirname, '_session');
-
-// Initialize WhatsApp
-async function initWhatsApp() {
-  client = await wppconnect.create({
-    session: SESSION_DIR,        // folder to store session
-    catchQR: (qrCode, asciiQR, attempt, urlCode) => {
-      console.log('Scan this QR to log in:');
-      console.log(qrCode); // or asciiQR for terminal
-    },
-    statusFind: (statusSession, session) => {
-      console.log('Status Session:', statusSession);
-    },
-    headless: true,             // no browser window
-  });
-
-  client.onMessage((message) => {
-    console.log('Received WhatsApp message:', message.body);
-  });
-
-  console.log('WhatsApp initialized successfully!');
-}
-
-// Send WhatsApp message
+/**
+ * Send WhatsApp message via Cloud API
+ * @param {string} phone - Phone number with country code, e.g., 91XXXXXXXXXX
+ * @param {string} message - Message to send
+ */
 async function sendWhatsAppMessage(phone, message) {
-  if (!client) throw new Error('WhatsApp client not initialized');
+  if (!WHATSAPP_TOKEN || !PHONE_NUMBER_ID) {
+    throw new Error("WhatsApp Cloud API credentials not set");
+  }
 
-  // Ensure phone has country code, e.g., '91XXXXXXXXXX'
-  const formattedPhone = phone.includes('@c.us') ? phone : `${phone}@c.us`;
+  const url = `https://graph.facebook.com/v17.0/${PHONE_NUMBER_ID}/messages`;
+  const payload = {
+    messaging_product: "whatsapp",
+    to: phone, // must include country code
+    type: "text",
+    text: { body: message },
+  };
 
-  return await client.sendText(formattedPhone, message);
+  try {
+    const res = await axios.post(url, payload, {
+      headers: {
+        Authorization: `Bearer ${WHATSAPP_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (err) {
+    console.error("WhatsApp API error:", err.response?.data || err.message);
+    throw err;
+  }
 }
 
-module.exports = {
-  initWhatsApp,
-  sendWhatsAppMessage,
-};
+module.exports = { sendWhatsAppMessage };

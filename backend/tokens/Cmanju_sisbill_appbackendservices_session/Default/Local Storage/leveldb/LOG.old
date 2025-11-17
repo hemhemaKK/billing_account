@@ -1,3 +1,6 @@
-2025/11/17-10:15:23.172 6260 Reusing MANIFEST C:\manju_sis\bill_app\backend\tokens\Cmanju_sisbill_appbackendservices_session\Default\Local Storage\leveldb/MANIFEST-000001
-2025/11/17-10:15:23.181 6260 Recovering log #60
-2025/11/17-10:15:23.187 6260 Reusing old log C:\manju_sis\bill_app\backend\tokens\Cmanju_sisbill_appbackendservices_session\Default\Local Storage\leveldb/000060.log 
+2025/11/17-10:15:26.781 375c Reusing MANIFEST C:\manju_sis\bill_app\backend\tokens\Cmanju_sisbill_appbackendservices_session\Default\Local Storage\leveldb/MANIFEST-000001
+2025/11/17-10:15:26.788 375c Recovering log #60
+2025/11/17-10:15:26.791 375c Reusing old log C:\manju_sis\bill_app\backend\tokens\Cmanju_sisbill_appbackendservices_session\Default\Local Storage\leveldb/000060.log 
+2025/11/17-10:17:27.103 392c Level-0 table #64: started
+2025/11/17-10:17:27.139 392c Level-0 table #64: 15372 bytes OK
+2025/11/17-10:17:27.144 392c Delete type=0 #60
