@@ -32,7 +32,7 @@ exports.createInitialAdmin = async (req, res) => {
 // ---------------------------------------------
 // Admin Login
 // ---------------------------------------------
-exports.loginAdmin = async (req, res) => {
+exports.loginAdmin = async (req, res) => { 
   try {
     const { username, password } = req.body;
 

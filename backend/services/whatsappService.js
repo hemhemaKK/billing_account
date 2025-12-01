@@ -1,38 +1,38 @@
-const axios = require("axios");
+const wppconnect = require('@wppconnect-team/wppconnect');
+const path = require('path');
 
-const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
-const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
+let client;
 
-/**
- * Send WhatsApp message via Cloud API
- * @param {string} phone - recipient number (with country code)
- * @param {string} message - message content
- */
-async function sendWhatsAppMessage(phone, message) {
-  if (!WHATSAPP_TOKEN || !PHONE_NUMBER_ID) {
-    throw new Error("WhatsApp credentials not set");
-  }
+// Folder to store WhatsApp session tokens
+const SESSION_DIR = path.join(__dirname, '_session');
 
-  const url = `https://graph.facebook.com/v22.0/${PHONE_NUMBER_ID}/messages`;
-  const payload = {
-    messaging_product: "whatsapp",
-    to: phone,
-    type: "text",
-    text: { body: message },
-  };
+async function initWhatsApp() {
+  client = await wppconnect.create({
+    session: 'mySession',              // session name, not folder path
+    folderNameToken: '_session',       // folder to store session tokens
+    catchQR: (qrCode, asciiQR, attempt, urlCode) => {
+      console.log('Scan this QR to log in:');
+      console.log(asciiQR);            // QR in terminal
+    },
+    statusFind: (statusSession, session) => {
+      console.log('Status Session:', statusSession);
+    },
+    headless: true,
+  });
 
-  try {
-    const res = await axios.post(url, payload, {
-      headers: {
-        Authorization: `Bearer ${WHATSAPP_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-    });
-    return res.data;
-  } catch (err) {
-    console.error("WhatsApp API error:", err.response?.data || err.message);
-    throw err;
-  }
+  client.onMessage((message) => {
+    console.log('Received WhatsApp message:', message.body);
+  });
+
+  console.log('WhatsApp initialized successfully!');
 }
 
-module.exports = { sendWhatsAppMessage };
+async function sendWhatsAppMessage(phone, message) {
+  if (!client) throw new Error('WhatsApp client not initialized');
+
+  const formattedPhone = phone.includes('@c.us') ? phone : `${phone}@c.us`;
+
+  return await client.sendText(formattedPhone, message);
+}
+
+module.exports = { initWhatsApp, sendWhatsAppMessage };
